@@ -3,6 +3,7 @@ import re
 import requests
 import csv
 from bs4 import BeautifulSoup
+import pandas as pd
 
 wiki_base_url = 'https://es.wikipedia.org/'
 
@@ -190,14 +191,14 @@ def limpiar_millones(monto):
         valores_millones = [int(m) for m in patron_millon]
         if valores_millones:
             max_valor = max(valores_millones) * 1_000_000
-            return max_valor
+            return f"{max_valor:,}".replace(',', '.') 
         return None
     else:
         patron_mil = re.findall(r'(\d+)', monto)
         if patron_mil:
             valores = [int(m) for m in patron_mil]
             max_valor = max(valores)
-            return max_valor
+            return f"{max_valor:,}".replace(',', '.')
         return None
 
 for pelicula in moviesInfo[1:]:
@@ -214,8 +215,11 @@ for pelicula in moviesInfo[1:]:
     for i in range(8, 14):  
         pelicula[i] = anadir_coma(pelicula[i])
 
-# Escribe moviesInfo en un archivo .csv llamado oscars_internacional.csv
-with open("/content/drive/MyDrive/oscars_internacional.csv", 'w', newline='', encoding='utf-8') as csvFile:
+currentDir = os.getcwd()
+filename = "peliculas.csv"
+filePath = os.path.join(currentDir, filename)
+# Escribe moviesInfo en un archivo .csv llamado peliculas.csv
+with open(filePath, 'w', newline='', encoding='utf-8') as csvFile:
   writer = csv.writer(csvFile)
   for info in moviesInfo:
     writer.writerow(info)
