@@ -190,14 +190,14 @@ def limpiar_millones(monto):
         valores_millones = [int(m) for m in patron_millon]
         if valores_millones:
             max_valor = max(valores_millones) * 1_000_000
-            return f"{max_valor:,}".replace(',', '.') 
+            return max_valor
         return None
     else:
         patron_mil = re.findall(r'(\d+)', monto)
         if patron_mil:
             valores = [int(m) for m in patron_mil]
             max_valor = max(valores)
-            return f"{max_valor:,}".replace(',', '.')
+            return max_valor
         return None
 
 for pelicula in moviesInfo[1:]:
