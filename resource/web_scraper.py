@@ -4,8 +4,6 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 
-#Parse command line arguments
-
 wiki_base_url = 'https://es.wikipedia.org/'
 
 # Envía una solicitud a una URL de Wikipedia (wiki_base_url + queryURL) y extrae información de las tablas precedidas por los encabeados décadas.
@@ -30,13 +28,17 @@ def queryInfo(oscar, headersValues, elementList):
                 listaPeliculas = filas.find_all('tr') if filas else []
                 # Se establece un contador para poder definir cuales peiculas han ganado el Oscar
                 contador_filas = 0
+                año_actual = None
 
                 for pelicula in listaPeliculas:
                     celdas = pelicula.find_all('td')
                     if celdas:
+                        # Cada vez que se encuentre rowspan, se extraerá el año. 
+                        if celdas[0].get('rowspan'):
+                            año_actual = celdas[0].text.strip()
                         # Debido a la estructura HTML del sitio, debemos de buscar los td sin rowspan, ya que este hace referencia al año
                         if celdas[0].get('rowspan'):
-                            enlace = celdas[1].find('a')  # Buscar en el siguiente td
+                            enlace = celdas[1].find('a')
                         else:
                             enlace = celdas[0].find('a')
                         ganador = 1 if contador_filas % 5 == 0 else 0
@@ -45,12 +47,12 @@ def queryInfo(oscar, headersValues, elementList):
                             buscar_no_redactados = enlace.get('title')
                             contador_filas += 1
                             if '(aún no redactado)' not in buscar_no_redactados:
-                                queryMovie(enlace.get('href'), enlace.get('title'), headersValues, elementList, ganador) 
+                                queryMovie(enlace.get('href'), enlace.get('title'), headersValues, elementList, año_actual, ganador) 
                                 # Añadimos ganador como nueva variable
                     
 
 # Extrae información de cada película desde su página en Wikipedia
-def queryMovie(queryURL,titulo,headersValues,elementList, ganador):
+def queryMovie(queryURL,titulo,headersValues,elementList, año_actual, ganador):
     response= requests.post(wiki_base_url+queryURL, headers=headersValues)
     soup = BeautifulSoup(response.text,"html.parser")
     # Encuentra la tabla Infobox, de donde sacaremos nuestra información
@@ -61,7 +63,6 @@ def queryMovie(queryURL,titulo,headersValues,elementList, ganador):
         # Información del director
         director = get_value_from_table(tablaInfo, "Director de cine")
         pais = get_value_from_table(tablaInfo, "País")
-        año = get_value_from_table(tablaInfo, "Año")
         genero = get_value_from_table(tablaInfo, "Género cinematográfico")
         duracion = get_value_from_table(tablaInfo, "Duración")
         
@@ -93,7 +94,7 @@ def queryMovie(queryURL,titulo,headersValues,elementList, ganador):
         pelicula.append(titulo)
         pelicula.append(director)
         pelicula.append(pais)
-        pelicula.append(año)
+        pelicula.append(año_actual)
         pelicula.append(genero)
         pelicula.append(duracion)
         pelicula.append(protagonistas)
@@ -201,7 +202,7 @@ def limpiar_millones(monto):
 
 for pelicula in moviesInfo[1:]:
     for i in range(len(pelicula)):
-        if i != 3 and i !=16:  
+        if i !=16:  
             pelicula[i] = limpiar(pelicula[i])
 
 for pelicula in moviesInfo[1:]:
