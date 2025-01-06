@@ -3,7 +3,6 @@ import re
 import requests
 import csv
 from bs4 import BeautifulSoup
-import pandas as pd
 
 wiki_base_url = 'https://es.wikipedia.org/'
 
@@ -39,7 +38,7 @@ def queryInfo(oscar, headersValues, elementList):
                             año_actual = celdas[0].text.strip()
                         # Debido a la estructura HTML del sitio, debemos de buscar los td sin rowspan, ya que este hace referencia al año
                         if celdas[0].get('rowspan'):
-                            enlace = celdas[1].find('a')
+                            enlace = celdas[1].find('a')  
                         else:
                             enlace = celdas[0].find('a')
                         ganador = 1 if contador_filas % 5 == 0 else 0
@@ -191,14 +190,14 @@ def limpiar_millones(monto):
         valores_millones = [int(m) for m in patron_millon]
         if valores_millones:
             max_valor = max(valores_millones) * 1_000_000
-            return f"{max_valor:,}".replace(',', '.') 
+            return max_valor 
         return None
     else:
         patron_mil = re.findall(r'(\d+)', monto)
         if patron_mil:
             valores = [int(m) for m in patron_mil]
             max_valor = max(valores)
-            return f"{max_valor:,}".replace(',', '.')
+            return max_valor
         return None
 
 for pelicula in moviesInfo[1:]:
@@ -215,10 +214,10 @@ for pelicula in moviesInfo[1:]:
     for i in range(8, 14):  
         pelicula[i] = anadir_coma(pelicula[i])
 
+# Escribe moviesInfo en un archivo .csv llamado peliculas.csv
 currentDir = os.getcwd()
 filename = "peliculas.csv"
 filePath = os.path.join(currentDir, filename)
-# Escribe moviesInfo en un archivo .csv llamado peliculas.csv
 with open(filePath, 'w', newline='', encoding='utf-8') as csvFile:
   writer = csv.writer(csvFile)
   for info in moviesInfo:
