@@ -214,8 +214,8 @@ for pelicula in moviesInfo[1:]:
     for i in range(8, 14):  
         pelicula[i] = anadir_coma(pelicula[i])
 
-# Escribe moviesInfo en un archivo .csv llamado peliculas.csv
-with open("/content/drive/MyDrive/oscars.csv", 'w', newline='', encoding='utf-8') as csvFile:
+# Escribe moviesInfo en un archivo .csv llamado oscars_internacional.csv
+with open("/content/drive/MyDrive/oscars_internacional.csv", 'w', newline='', encoding='utf-8') as csvFile:
   writer = csv.writer(csvFile)
   for info in moviesInfo:
     writer.writerow(info)
