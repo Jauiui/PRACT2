@@ -58,7 +58,7 @@ def queryMovie(queryURL,titulo,headersValues,elementList, año_actual, ganador):
     # Encuentra la tabla Infobox, de donde sacaremos nuestra información
     tablaInfo = soup.find("table", {"class": "infobox plainlist plainlinks"})
     
-    # Obseramos que hay enlaces a pleículas sin infobox
+    # Obseramos que hay enlaces a plelículas sin infobox
     if tablaInfo:
         # Información del director
         director = get_value_from_table(tablaInfo, "Director de cine")
@@ -209,11 +209,12 @@ for pelicula in moviesInfo[1:]:
     pelicula[5] = limpiar_duracion(pelicula[5])
     pelicula[2] = anadir_coma(pelicula[2])
     pelicula[6] = anadir_coma(pelicula[6])
+    pelicula[7] = anadir_coma(pelicula[7])
     pelicula[14] = limpiar_millones(pelicula[14])
     pelicula[15] = limpiar_millones(pelicula[15])
     for i in range(8, 14):  
         pelicula[i] = anadir_coma(pelicula[i])
-
+        
 # Escribe moviesInfo en un archivo .csv llamado peliculas.csv
 currentDir = os.getcwd()
 filename = "peliculas.csv"
