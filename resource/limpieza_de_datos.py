@@ -1,43 +1,84 @@
 import pandas as pd
-import re
+from unidecode import unidecode
+from sklearn.preprocessing import StandardScaler
 
-# Leer el archivo CSV
-df = pd.read_csv('peliculas.csv')
+df = pd.read_csv("/content/drive/MyDrive/oscars.csv", encoding="utf-8")
 
-print(df['Protagonistas'].head())
+# Realizamos un análisis previo de la estructura y otros datos del dataframe
+print("Dimensiones del DataFrame:")
+print(df.shape)
 
-def procesar_protagonistas(protagonistas):
-    lista = protagonistas.split(', ')
-    if re.match(r'^\d*\s*personas?$', lista[0], re.IGNORECASE):
-        lista = lista[1:]  # Omitir el primer elemento
-    return lista[:4]  # Tomar los primeros 4 después del filtro
+print("\nTipos de datos:")
+print(df.dtypes)
 
-def limpiar_columna(df, nombre_columna):
-    
-    df[nombre_columna] = df[nombre_columna].fillna('')
+print("\nValores nulos por columna:")
+print(df.isnull().sum())
 
-    if nombre_columna == 'Protagonistas':
-        columna_limitada = df[nombre_columna].apply(procesar_protagonistas)
-    else:
-        columna_limitada = df[nombre_columna].str.split(', ').apply(lambda x: x[:4])
+print("\nEstadísticas descriptivas de columnas numéricas:")
+print(df.describe())
 
-    # Expandir los protagonistas a columnas
-    columna_limitada = columna_limitada.apply(pd.Series)
+print("\nEstadísticas de columnas categóricas:")
+print(df.describe(include=["object"]))
 
-    # Renombrar columnas dinámicamente
-    columna_limitada.columns = [f'{nombre_columna}_{i+1}' for i in range(columna_limitada.shape[1])]
-    print(type(columna_limitada))
-    df = pd.concat([df, columna_limitada], axis=1)
-    df.drop(columns=[nombre_columna], inplace=True)
-    return df
+# Eliminamos valores sin sentido
+def remove_personas_from_protagonist(text):
+    if isinstance(text, str):
+        values = text.split(", ")
+        filtered_values = [value for value in values if 'persona' not in value.lower()]
+        return ', '.join(filtered_values)  
+    return text 
 
-df = limpiar_columna(df, "Protagonistas")
-df = limpiar_columna(df, "Producción")
-df = limpiar_columna(df, "Guion")
-df = limpiar_columna(df, "Música")
-df = limpiar_columna(df, "Fotografía")
-df = limpiar_columna(df, "Vestuario")
-df = limpiar_columna(df, "Productora")
+df["Protagonistas"] = df["Protagonistas"].apply(remove_personas_from_protagonist)
 
-df.to_csv('peliculas2.csv', index=False, encoding='utf-8')
-#protagonistas_expandido.to_csv('peliculas3.csv', index=False, encoding='utf-8')
+# Debido a que tenemos columnas con varios valores, vamos a elegir el valor más repetido a lo largo del dataframe para cada columna como 
+# representante de la columna per sé. Esto nos ayudará a un análisis más claro de los datos categóricos, simplificando los datos de manera útil
+# para los ejercicios de clustering o regresión consiguientes. Además trando los valores de texto.
+def get_frequent_value(column, freq_dict):
+    if isinstance(column, str):
+        truncated_values = [" ".join(value.split()[:2]) for value in column.split(", ")]
+        truncated_values_normalized = [unidecode(value.lower()) for value in truncated_values]
+        value_counts = {value: freq_dict.get(value, 0) for value in truncated_values_normalized}
+        return max(value_counts.items(), key=lambda x: (x[1], -truncated_values_normalized.index(x[0])))[0] if value_counts else None
+    return None
+
+columns_to_process = ["Director", "Pais", "Genero", "Protagonistas", "Idioma", "Producción", "Guion", "Música", "Fotografía", "Vestuario", "Productora"]
+
+freq_dicts = {}
+for column in columns_to_process:
+    all_values = df[column].str.split(", ").explode().value_counts()
+    freq_dicts[column] = all_values.to_dict()
+
+for column in columns_to_process:
+    df[f"MF_{column}"] = df[column].apply(lambda x: get_frequent_value(x, freq_dicts[column]))
+
+# Estandarizamos las variables numéricas
+scaler = StandardScaler()
+
+df["st_Duración"] = scaler.fit_transform(df[["Duración (Minutos)"]])
+df["st_Presupuesto"] = scaler.fit_transform(df[["Presupuesto (Dólares)"]])
+df["st_Recaudación"] = scaler.fit_transform(df[["Recaudación (Dólares)"]])
+
+# Corregimos los tipos de datos necesarios
+df["Año"] = df["Año"].str.extract(r"(\d{4})")
+df["Año"] = pd.to_numeric(df["Año"])
+
+print("\nTipos de datos:")
+print(df.dtypes)
+
+print("\nEstadísticas descriptivas de columnas numéricas:")
+print(df.describe())
+
+print("\nEstadísticas de columnas categóricas:")
+print(df.describe(include=["object"]))
+
+# Imprimir el resultado
+print("\nDataframe limpiado:")
+print(df)
+
+df.head(20)
+
+
+currentDir = os.getcwd()
+filename = "peliculas_clean.csv"
+filePath = os.path.join(currentDir, filename)
+df.to_csv(filePath)
