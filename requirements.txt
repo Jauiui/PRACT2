@@ -3,3 +3,6 @@ re
 requests
 csv
 beautifulsoup4
+pandas
+unidecode
+sklearn.preprocessing
