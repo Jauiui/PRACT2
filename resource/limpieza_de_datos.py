@@ -2,7 +2,10 @@ import pandas as pd
 from unidecode import unidecode
 from sklearn.preprocessing import StandardScaler
 
-df = pd.read_csv("/content/drive/MyDrive/oscars.csv", encoding="utf-8")
+currentDir = os.getcwd()
+filename = "peliculas.csv"
+filePath = os.path.join(currentDir, filename)
+df = pd.read_csv(filePath, encoding="utf-8")
 
 # Realizamos un análisis previo de la estructura y otros datos del dataframe
 print("Dimensiones del DataFrame:")
@@ -76,7 +79,6 @@ print("\nDataframe limpiado:")
 print(df)
 
 df.head(20)
-
 
 currentDir = os.getcwd()
 filename = "peliculas_clean.csv"
