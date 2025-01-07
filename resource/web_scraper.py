@@ -208,11 +208,11 @@ for pelicula in moviesInfo[1:]:
 for pelicula in moviesInfo[1:]:
     pelicula[5] = limpiar_duracion(pelicula[5])
     pelicula[2] = anadir_coma(pelicula[2])
-    pelicula[6] = anadir_coma(pelicula[6])
-    pelicula[7] = anadir_coma(pelicula[7])
+    pelicula[1] = anadir_coma(pelicula[1])
+    pelicula[4] = anadir_coma(pelicula[4])
     pelicula[14] = limpiar_millones(pelicula[14])
     pelicula[15] = limpiar_millones(pelicula[15])
-    for i in range(8, 14):  
+    for i in range(6, 14):  
         pelicula[i] = anadir_coma(pelicula[i])
         
 # Escribe moviesInfo en un archivo .csv llamado peliculas.csv
