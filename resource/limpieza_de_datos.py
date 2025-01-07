@@ -65,6 +65,13 @@ df["st_Recaudación"] = scaler.fit_transform(df[["Recaudación (Dólares)"]])
 df["Año"] = df["Año"].str.extract(r"(\d{4})")
 df["Año"] = pd.to_numeric(df["Año"])
 
+columns_to_convert = ['MF_Director', 'MF_Pais', 'MF_Genero', 'MF_Protagonistas', 
+                      'MF_Idioma', 'MF_Producción', 'MF_Guion', 'MF_Música', 
+                      'MF_Fotografía', 'MF_Vestuario', 'MF_Productora']
+
+for column in columns_to_convert: # En python, lo equivalente a convertir en factor es category
+    df[column] = df[column].astype('category')
+
 print("\nTipos de datos:")
 print(df.dtypes)
 
@@ -79,6 +86,7 @@ print("\nDataframe limpiado:")
 print(df)
 
 df.head(20)
+
 
 currentDir = os.getcwd()
 filename = "peliculas_clean.csv"
