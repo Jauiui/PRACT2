@@ -27,13 +27,13 @@ print(df.describe(include=["object"]))
 def remove_personas_from_protagonist(text):
     if isinstance(text, str):
         values = text.split(", ")
-        filtered_values = [value for value in values if 'persona' not in value.lower()]
-        return ', '.join(filtered_values)  
-    return text 
+        filtered_values = [value for value in values if "persona" not in value.lower()]
+        return ", ".join(filtered_values)
+    return text
 
 df["Protagonistas"] = df["Protagonistas"].apply(remove_personas_from_protagonist)
 
-# Debido a que tenemos columnas con varios valores, vamos a elegir el valor más repetido a lo largo del dataframe para cada columna como 
+# Debido a que tenemos columnas con varios valores, vamos a elegir el valor más repetido a lo largo del dataframe para cada columna como
 # representante de la columna per sé. Esto nos ayudará a un análisis más claro de los datos categóricos, simplificando los datos de manera útil
 # para los ejercicios de clustering o regresión consiguientes. Además trando los valores de texto.
 def get_frequent_value(column, freq_dict):
@@ -65,12 +65,12 @@ df["st_Recaudación"] = scaler.fit_transform(df[["Recaudación (Dólares)"]])
 df["Año"] = df["Año"].str.extract(r"(\d{4})")
 df["Año"] = pd.to_numeric(df["Año"])
 
-columns_to_convert = ['MF_Director', 'MF_Pais', 'MF_Genero', 'MF_Protagonistas', 
-                      'MF_Idioma', 'MF_Producción', 'MF_Guion', 'MF_Música', 
-                      'MF_Fotografía', 'MF_Vestuario', 'MF_Productora']
+columns_to_convert = ["MF_Director", "MF_Pais", "MF_Genero", "MF_Protagonistas",
+                      "MF_Idioma", "MF_Producción", "MF_Guion", "MF_Música",
+                      "MF_Fotografía", "MF_Vestuario", "MF_Productora"]
 
 for column in columns_to_convert: # En python, lo equivalente a convertir en factor es category
-    df[column] = df[column].astype('category')
+    df[column] = df[column].astype("category")
 
 print("\nTipos de datos:")
 print(df.dtypes)
@@ -86,7 +86,6 @@ print("\nDataframe limpiado:")
 print(df)
 
 df.head(20)
-
 
 currentDir = os.getcwd()
 filename = "peliculas_clean.csv"
