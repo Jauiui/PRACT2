@@ -1,4 +1,5 @@
 from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import RocCurveDisplay
 from sklearn.tree import plot_tree
@@ -21,8 +22,6 @@ columns_to_encode = [
 for column in columns_to_encode:
     frequency_encoding = df[column].value_counts() / len(df)
     df[column + "_encoded"] = df[column].map(frequency_encoding)
-
-from sklearn.model_selection import train_test_split
 
 print(df.columns)
 
