@@ -6,36 +6,39 @@ import matplotlib.pyplot as plt
 import catboost as cb
 import pandas as pd
 
-df = pd.read_csv("/content/drive/MyDrive/oscars_clean.csv", encoding="utf-8")
+currentDir = os.getcwd()
+filename = "peliculas_clean.csv"
+filePath = os.path.join(currentDir, filename)
+df = pd.read_csv(filePath, encoding="utf-8")
 
 columns_to_encode = [
-    'MF_Director', 'MF_Pais', 'MF_Genero', 'MF_Protagonistas',
-    'MF_Idioma', 'MF_Producción', 'MF_Guion', 'MF_Música',
-    'MF_Fotografía', 'MF_Vestuario', 'MF_Productora'
+    "MF_Director", "MF_Pais", "MF_Genero", "MF_Protagonistas",
+    "MF_Idioma", "MF_Producción", "MF_Guion", "MF_Música",
+    "MF_Fotografía", "MF_Vestuario", "MF_Productora"
 ]
 
 # Aplicar Frequency Encoding a cada una de las columnas
 for column in columns_to_encode:
     frequency_encoding = df[column].value_counts() / len(df)
-    df[column + '_encoded'] = df[column].map(frequency_encoding)
+    df[column + "_encoded"] = df[column].map(frequency_encoding)
 
 from sklearn.model_selection import train_test_split
 
 print(df.columns)
 
 # Dividir características (X) y objetivo (y)
-predictores = ['MF_Director_encoded', 'MF_Pais_encoded', 'MF_Genero_encoded', 'MF_Protagonistas_encoded',
-               'MF_Idioma_encoded', 'MF_Producción_encoded', 'MF_Guion_encoded', 'MF_Música_encoded', 'MF_Fotografía_encoded',
-               'MF_Vestuario_encoded', 'MF_Productora_encoded', 'st_Duración', 'st_Presupuesto', 'st_Recaudación']
+predictores = ["MF_Director_encoded", "MF_Pais_encoded", "MF_Genero_encoded", "MF_Protagonistas_encoded",
+               "MF_Idioma_encoded", "MF_Producción_encoded", "MF_Guion_encoded", "MF_Música_encoded", "MF_Fotografía_encoded",
+               "MF_Vestuario_encoded", "MF_Productora_encoded", "st_Duración", "st_Presupuesto", "st_Recaudación"]
 
 X = df[predictores]
-y = df['Ganador'].astype('category').cat.codes
+y = df["Ganador"].astype("category").cat.codes
 
 print(X)
 print(y)
 
 df_combined = X.copy()
-df_combined['Ganador'] = y  # Añadir la columna de y (objetivo)
+df_combined["Ganador"] = y  # Añadir la columna de y (objetivo)
 
 plt.figure(figsize=(10, 8))
 sns.heatmap(df_combined.corr(), annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
@@ -100,25 +103,25 @@ plt.show()
 
 # Curva ROC para todos los modelos
 plt.figure(figsize=(8, 6))
-RocCurveDisplay.from_estimator(dt_model, X_test, y_test, name='Árbol de Decisión')
-plt.plot([0, 1], [0, 1], 'k--', label="Aleatorio (AUC = 0.5)")
+RocCurveDisplay.from_estimator(dt_model, X_test, y_test, name="Árbol de Decisión")
+plt.plot([0, 1], [0, 1], "k--", label="Aleatorio (AUC = 0.5)")
 plt.title("Curva ROC para Árbol de Decisión")
-plt.xlabel('Falsos Positivos')
-plt.ylabel('Verdaderos Positivos')
-plt.legend(loc='lower right')
+plt.xlabel("Falsos Positivos")
+plt.ylabel("Verdaderos Positivos")
+plt.legend(loc="lower right")
 
-RocCurveDisplay.from_estimator(rf_model, X_test, y_test, name='Random Forest')
-plt.plot([0, 1], [0, 1], 'k--', label="Aleatorio (AUC = 0.5)")
+RocCurveDisplay.from_estimator(rf_model, X_test, y_test, name="Random Forest")
+plt.plot([0, 1], [0, 1], "k--", label="Aleatorio (AUC = 0.5)")
 plt.title("Curva ROC para Random Forest")
-plt.xlabel('Falsos Positivos')
-plt.ylabel('Verdaderos Positivos')
-plt.legend(loc='lower right')
+plt.xlabel("Falsos Positivos")
+plt.ylabel("Verdaderos Positivos")
+plt.legend(loc="lower right")
 
-RocCurveDisplay.from_estimator(cat_model, X_test, y_test, name='CatBoost')
-plt.plot([0, 1], [0, 1], 'k--', label="Aleatorio (AUC = 0.5)")
+RocCurveDisplay.from_estimator(cat_model, X_test, y_test, name="CatBoost")
+plt.plot([0, 1], [0, 1], "k--", label="Aleatorio (AUC = 0.5)")
 plt.title("Curva ROC para CatBoost")
-plt.xlabel('Falsos Positivos')
-plt.ylabel('Verdaderos Positivos')
-plt.legend(loc='lower right')
+plt.xlabel("Falsos Positivos")
+plt.ylabel("Verdaderos Positivos")
+plt.legend(loc="lower right")
 
 plt.show()
