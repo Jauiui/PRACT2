@@ -1,13 +1,15 @@
-from sklearn.impute import KNNImputer
+from sklearn.metrics import silhouette_samples, silhouette_score
+from sklearn.metrics import calinski_harabasz_score
+from sklearn.metrics import davies_bouldin_score
 from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import silhouette_score
+from sklearn.impute import KNNImputer
+from sklearn.cluster import DBSCAN
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import os
-from sklearn.cluster import DBSCAN
-from sklearn.metrics import silhouette_score
-from sklearn.metrics import davies_bouldin_score
-from sklearn.metrics import calinski_harabasz_score
 
 currentDir = os.getcwd()
 filename = "../dataset/peliculas_clean.csv"
@@ -66,9 +68,6 @@ print(f"Davies-Bouldin Index: {db_index}")
 ch_score = calinski_harabasz_score(X_imputed, dbscan.labels_)
 print(f"Calinski-Harabasz Index: {ch_score}")
 #Un puntaje de 70.87615695157243
-
-from sklearn.metrics import silhouette_samples, silhouette_score
-import matplotlib.cm as cm
 
 # Calcular puntajes de silhouette
 if len(set(dbscan.labels_)) > 1:  # Al menos 2 clusters
