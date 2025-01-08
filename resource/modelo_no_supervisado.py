@@ -1,11 +1,12 @@
 from sklearn.impute import KNNImputer
+from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 from sklearn.cluster import DBSCAN
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_samples, silhouette_score
 from sklearn.metrics import davies_bouldin_score
 from sklearn.metrics import calinski_harabasz_score
 
@@ -67,14 +68,10 @@ ch_score = calinski_harabasz_score(X_imputed, dbscan.labels_)
 print(f"Calinski-Harabasz Index: {ch_score}")
 #Un puntaje de 70.87615695157243
 
-from sklearn.metrics import silhouette_samples, silhouette_score
-import matplotlib.cm as cm
-
 # Calcular puntajes de silhouette
 if len(set(dbscan.labels_)) > 1:  # Al menos 2 clusters
     silhouette_vals = silhouette_samples(X_imputed, dbscan.labels_)
-
-    # Crear el gráfico de silhouette
+    
     y_lower, y_upper = 0, 0
     for i, cluster in enumerate(np.unique(dbscan.labels_)):
         cluster_silhouette_vals = silhouette_vals[dbscan.labels_ == cluster]
@@ -90,3 +87,14 @@ if len(set(dbscan.labels_)) > 1:  # Al menos 2 clusters
     plt.show()
 else:
     print("No se puede calcular el gráfico de Silhouette: hay un solo cluster o solo ruido.")
+    
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_imputed)
+
+# Visualizar los clusters con PCA
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=dbscan.labels_, cmap='viridis', s=50)
+plt.title("Clusters DBSCAN (Reducido con PCA)")
+plt.xlabel("Componente Principal 1")
+plt.ylabel("Componente Principal 2")
+plt.colorbar(label="Cluster")
+plt.show()
