@@ -5,6 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import silhouette_score
 from sklearn.impute import KNNImputer
 from sklearn.cluster import DBSCAN
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pandas as pd
@@ -88,3 +89,14 @@ if len(set(dbscan.labels_)) > 1:  # Al menos 2 clusters
     plt.show()
 else:
     print("No se puede calcular el gráfico de Silhouette: hay un solo cluster o solo ruido.")
+    
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_imputed)  # Usa los datos imputados
+
+# Visualizar los clusters
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=dbscan.labels_, cmap='viridis', s=50)
+plt.title("Clusters DBSCAN (Reducido con PCA)")
+plt.xlabel("Componente Principal 1")
+plt.ylabel("Componente Principal 2")
+plt.colorbar(label="Cluster")
+plt.show()
